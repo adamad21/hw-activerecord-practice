@@ -21,12 +21,57 @@ class Customer < ApplicationRecord
   #  You should NOT need to call Ruby library functions for sorting, filtering, etc.
 
   def self.any_candice
-    # YOUR CODE HERE to return all customer(s) whose first name is Candice
-    # probably something like:  Customer.where(....)
+    where(first: 'Candice')
   end
 
   def self.with_valid_email
-    # YOUR CODE HERE to return only customers with valid email addresses (containing '@')
+   where("email LIKE ?", "%@%")
   end
+
+  def self.with_dot_org_email
+    where("email LIKE ?", "%.org")
+  end
+
+  def self.with_invalid_email
+    where("email NOT LIKE ? AND email != ''", "%@%")
+  end
+
+  def self.with_blank_email
+    where(email: [nil, ''])
+  end
+
+  def self.born_before_1980
+    where("birthdate < ?", Date.new(1980, 1, 1))
+  end
+
+  def self.with_valid_email_and_born_before_1980
+    with_valid_email.born_before_1980
+  end
+
+  def self.last_names_starting_with_b
+    where("last LIKE ?", "B%").order(:birthdate)
+  end
+
+  def self.twenty_youngest
+    order(birthdate: :desc).limit(20)
+  end
+
+  def self.update_gussie_murray_birthdate
+    gussie = find_by(first: 'Gussie', last: 'Murray')
+    gussie.update(birthdate: Date.new(2004, 2, 8)) if gussie
+  end
+
+  def self.change_all_invalid_emails_to_blank
+    where("email NOT LIKE ? AND email != ''", "%@%").update_all(email: '')
+  end
+
+  def self.delete_meggie_herman
+    where(first: 'Meggie', last: 'Herman').delete_all
+  end
+
+  def self.delete_everyone_born_before_1978
+    where("birthdate < ?", Date.new(1978, 1, 1)).delete_all
+  end
+
   # etc. - see README.md for more details
 end
